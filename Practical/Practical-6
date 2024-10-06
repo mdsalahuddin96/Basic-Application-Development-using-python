@@ -1,0 +1,42 @@
+import ipywidgets as widgets
+from IPython.display import display
+import pandas as pd
+
+#Initialize an empty DataFrame to store the data
+data = pd.DataFrame(columns=["Name", "Age"])
+
+# Function to handle form submission
+def save_data(b):
+    name = name_input.value
+    age = age_input.value
+    if name and age:
+        data.loc[len(data)] = [name, age]
+        print("Data saved successfully.")
+# Function to handle search
+def search_data(b):
+    name = name_input.value
+    if name:
+        result = data[data["Name"] == name]
+        if not result.empty:
+            print("Search results:")
+            print(result)
+        else:
+            print("No matching records found.")
+
+# Create input widgets
+name_input = widgets.Text(description="Name:")
+age_input = widgets.Text(description="Age:")
+
+# Create buttons
+save_button = widgets.Button(description="Save")
+search_button = widgets.Button(description="Search")
+
+# For save & search data
+save_button.on_click(save_data)
+search_button.on_click(search_data)
+
+# Display widgets
+display(name_input)
+display(age_input)
+display(save_button)
+display(search_button)

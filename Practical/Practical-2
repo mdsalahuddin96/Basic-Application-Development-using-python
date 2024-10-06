@@ -1,0 +1,91 @@
+import pandas as pd
+import csv
+import datetime
+from reportlab.lib.pagesizes import letter
+from reportlab.pdfgen import canvas
+
+
+# Take item data from the user
+def get_student_data():
+    ID = input("Enter Student ID: ")
+    Name =input("Enter Student Nane: ")
+    Roll=input("Enter Roll: ")
+    Semester=input("Enter Semester: ")
+    Shift=input("Enter Shift: ")
+    Department=input("Enter Department Nane: ")
+    Date_Of_Birth=input("Enter your DOB (Day-Month-year): ")
+    Phone_number=input("Enter Your Phone number: ")
+    return {
+        "ID": ID,
+        "Name": Name,
+        "Roll": Roll,
+        "Semester": Semester,
+        "Shift": Shift,
+        "Department": Department,
+        "Date_Of_Birth": Date_Of_Birth,
+        "Phone_number": Phone_number
+    }
+
+#Store items data into CSV file
+
+def store_data_to_csv(data, filename="students_info.csv"):
+    fieldnames = ["ID", "Name","Roll","Semester","Shift","Department","Date_Of_Birth","Phone_number"]
+
+    with open(filename, 'a', newline='') as csvfile:
+        writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
+        # Write the data
+        writer.writerow(data)
+
+#For generating PDF report
+
+def generate_pdf_report(filename="students_info.csv", pdf_filename="students_report.pdf"):
+    # Create a new PDF file
+    c = canvas.Canvas(pdf_filename, pagesize=letter)
+    width, height = letter
+    # Define text position
+    text_y_position = height - 1 * inch
+    # Read CSV file
+    data_frame = pd.read_csv('students_info.csv')
+    # Create a PDF object
+    c = canvas.Canvas("students_report.pdf")
+    # Insert your PDF generation logic here
+    # For example, simple text output for each row
+    for index, row in data_frame.iterrows():
+      c.drawString(72, 800 - 15 * index, str(row.values))
+    # Save the PDF
+    c.save()
+    print(f"PDF report generated: {pdf_filename}")
+
+
+# Main program
+def main():
+    while True:
+        print("\nStudent Info Management")
+        print("1. Add new student info")
+        print("2. Generate PDF")
+        print("3. Exit")
+
+        choice = input("Choose an option: ")
+        if choice == '1':
+
+            #Take item data from the user
+            data = get_student_data()
+
+            #Store student info into CSV file
+            store_data_to_csv(data)
+            print("student data added successfully!")
+
+        elif choice == '2':
+            #Print PDF report
+            generate_pdf_report()
+
+        elif choice == '3':
+            print("Exiting the program.")
+            break
+
+        else:
+            print("Invalid choice, please try again.")
+
+# Run the main program
+if __name__ == "__main__":
+    main()

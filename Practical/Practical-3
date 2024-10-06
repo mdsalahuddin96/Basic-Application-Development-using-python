@@ -1,0 +1,70 @@
+import qrcode
+from barcode import Code128
+from barcode.writer import ImageWriter
+from PIL import Image
+from pyzbar.pyzbar import decode
+from datetime import datetime
+
+# Function to take student ID and name
+def take_student_info():
+    student_id = input("Enter Student ID: ")
+    name = input("Enter Name: ")
+    return student_id, name
+
+# Function to generate QR code from student ID and name
+def generate_qr_code(student_id, name):
+  data = f"Student ID: {student_id}, Name: {name}"
+  qr = qrcode.QRCode(version=1, box_size=10, border=5)
+  qr.add_data(data)
+  qr.make(fit=True)
+  qr_img = qr.make_image(fill='black', back_color='white')
+  qr_img.save(f"QR_Code_1.png")
+  print("QR code generated successfully.")
+
+# Function to generate Barcode from student ID and name
+def generate_barcode(student_id, name):
+  data = f"Student ID: {student_id}, Name: {name}"
+  barcode = Code128(data, writer=ImageWriter())
+  barcode_img = barcode.save(f"Barcode_1")
+  print("Barcode generated successfully.")
+
+#Function to decode QR code and Barcode data
+def decode_images():
+  # Decode QR codes
+  qr_data = []
+  qr_img_paths = [f"QR_Code_{i}.png" for i in range(1, 2)]
+  for qr_img_path in qr_img_paths:
+    qr_img = Image.open(qr_img_path)
+    decoded_qr = decode(qr_img)
+    qr_data.extend(decoded_qr)
+
+#Decode Barcodes
+  barcode_data = []
+  barcode_img_paths = [f"Barcode_{i}.png" for i in range(1, 2)]
+  for barcode_img_path in barcode_img_paths:
+    barcode_img = Image.open(barcode_img_path)
+    decoded_barcode = decode(barcode_img)
+    barcode_data.extend(decoded_barcode)
+
+  return qr_data, barcode_data
+
+#Function to print decoded data
+def print_decoded_data(qr_data,barcode_data):
+  print("\nDecoded QR Code Data:")
+  for qr in qr_data:
+    print(qr.data.decode('utf-8'))
+
+  print("\nDecoded Barcode Data:")
+  for barcode in barcode_data:
+    print(barcode.data.decode('utf-8'))
+
+# Main function
+def main():
+  student_id, name = take_student_info()
+  generate_qr_code(student_id, name)
+  generate_barcode(student_id, name)
+  qr_data, barcode_data= decode_images()
+  print_decoded_data(qr_data, barcode_data)
+
+if __name__ == "__main__":
+    main()

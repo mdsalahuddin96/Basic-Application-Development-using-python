@@ -1,0 +1,45 @@
+import requests
+from bs4 import BeautifulSoup
+import csv
+from datetime import datetime
+
+# Function to scrape data from website
+def scrape_website(url):
+    # Retrieve HTML content
+    response = requests.get(url)
+    html_content = response.text
+    # Parse HTML content using BeautifulSoup
+    soup = BeautifulSoup(html_content, 'html.parser')
+    # Extract basic data (book name, writer name, price)
+    books = []
+    for book in soup.find_all('div', class_='book-text-area'):
+        name = book.find('h4').text.strip()
+        writer = book.find('p').text.strip()
+        p= book.find('strike', class_="original-price pl-2")
+        if p:
+          price=p.text.strip()
+        else:
+          price="Price not available"
+        books.append({'Name': name, 'Writer': writer, 'Price': price})
+    return books
+
+# Function to save extracted data into CSV file
+def save_to_csv(data):
+    filename = 'scraped_data.csv'
+    with open(filename, 'w', newline='', encoding='utf-8') as csvfile:
+        fieldnames = ['Name', 'Writer', 'Price']
+        writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
+        writer.writeheader()
+        for book in data:
+            writer.writerow(book)
+    print("Data has saved successfully.Open the \"scraped_data.csv\" file and see the data.")
+
+# Main function
+def main():
+    url = "https://www.rokomari.com/book"
+    books_data = scrape_website(url)
+    if books_data:
+        save_to_csv(books_data)
+
+if __name__ == "__main__":
+    main()

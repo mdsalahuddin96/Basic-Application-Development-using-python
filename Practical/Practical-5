@@ -1,0 +1,42 @@
+import requests
+# Function to fetch weather data from OpenWeatherMap API
+def fetch_weather_data(location):
+
+    api_key = '9663bf9d35800c25286db2de1dad0d36'  # Replace with your own API key
+    base_url = "https://api.openweathermap.org/data/2.5/weather"  # Base URL for OpenWeatherMap API
+    params = {"q": location, "appid": api_key}
+
+    try:
+        response = requests.get(base_url, params=params) # Send HTTP GET request to OpenWeatherMap API
+        # Check if the request was successful (status code 200)
+        if response.status_code == 200:
+            weather_data = response.json() # Convert response to JSON format
+            return weather_data
+        else:
+            print("Failed to fetch weather data. Status code:", response.status_code)
+            return None
+    except requests.RequestException as e:
+        print("Error occurred during request:", e)
+        return None
+
+# Function to print basic weather data
+def print_weather_data(weather_data):
+    if weather_data:
+        print("Basic Weather Data:")
+        print("Location:", weather_data['name'])
+        print("Description:", weather_data['weather'][0]['description'])
+        print("Temperature (Celsius):", weather_data['main']['temp'] - 273.15)  # Convert from Kelvin to Celsius
+        print("Humidity:", weather_data['main']['humidity'])
+        print("Wind Speed (m/s):", weather_data['wind']['speed'])
+    else:
+        print("No weather data available.")
+
+
+# Main function
+def main():
+    location = input("Enter the location name: ")
+    weather_data = fetch_weather_data(location)
+    print_weather_data(weather_data)
+
+if __name__ == "__main__":
+    main()
