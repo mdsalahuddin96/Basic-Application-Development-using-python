@@ -1,0 +1,79 @@
+import csv
+import datetime
+
+# Take item data from the user
+def get_fruit_data():
+    fruit_name = input("Enter fruit name: ")
+    unit_price = float(input("Enter unit price: "))
+    quantity = int(input("Enter quantity: "))
+    total_price = unit_price * quantity
+
+    return {
+        "fruit_name": fruit_name,
+        "unit_price": unit_price,
+        "quantity": quantity,
+        "total_price": total_price
+    }
+
+#Store items data into CSV file
+def store_data_to_csv(data, filename="fruits_inventory.csv"):
+    fieldnames = ["fruit_name", "unit_price", "quantity", "total_price"]
+
+    with open(filename, 'a', newline='') as csvfile:
+        writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
+        # Write the data
+        writer.writerow(data)
+
+#Print fruits items summary data from stored CSV file
+def print_fruits_summary(filename="fruits_inventory.csv"):
+    with open(filename, 'r', newline='') as csvfile:
+        reader = csv.DictReader(csvfile)
+
+        print(f"{'Fruit Name':<15}{'Unit Price':<15}{'Quantity':<10}{'Total Price'}")
+        print('-' * 50)
+
+        for row in reader:
+            print(f"{row['fruit_name']:<15}{float(row['unit_price']):<15.2f}{int(row['quantity']):<10}{float(row['total_price']):.2f}")
+
+# Maintain the record of performed job
+def record_job(log_filename="job_log.txt", job_description=""):
+    timestamp = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+
+    with open(log_filename, 'a') as logfile:
+        logfile.write(f"[{timestamp}] {job_description}\n")
+
+# Main program
+def main():
+    while True:
+        print("\nInventory Management")
+        print("1. Add new fruit item")
+        print("2. View fruit items summary")
+        print("3. Exit")
+        choice = input("Choose an option: ")
+
+        if choice == '1':
+            #Take item data from the user
+            data = get_fruit_data()
+
+            #Store items data into CSV file
+            store_data_to_csv(data)
+
+            # Maintain the record of performed job
+            record_job(job_description=f"Added fruit item: {data}")
+
+            print("Fruit item added successfully!")
+
+        elif choice == '2':
+            #Print fruits items summary data from stored CSV file
+            print_fruits_summary()
+
+        elif choice == '3':
+            print("Exiting the program.")
+            break
+
+        else:
+            print("Invalid choice, please try again.")
+
+# Run the main program
+if __name__ == "__main__":
+    main()
