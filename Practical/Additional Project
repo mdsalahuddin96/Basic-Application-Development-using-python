@@ -1,0 +1,72 @@
+import csv
+import os
+
+filename = "fruits_inventory.csv"
+
+# Ask Budget
+budget = float(input("Enter your budget: "))
+
+# ALWAYS reset CSV when program starts
+with open(filename, mode="w", newline="") as file:
+    writer = csv.writer(file)
+    writer.writerow(["Fruit", "Unit Price", "Quantity", "Total Price"])
+
+# Calculate total spent
+def get_total_spent():
+    total_spent = 0
+    with open(filename, mode="r") as file:
+        reader = csv.DictReader(file)
+        for row in reader:
+            total_spent += float(row['Total Price'])
+    return total_spent
+
+# Add fruit item
+def add_item():
+    fruit = input("Enter fruit name: ")
+    unit_price = float(input("Enter unit price(TK): "))
+    quantity = int(input("Enter quantity(KG): "))
+    total_price = unit_price * quantity
+
+    total_spent = get_total_spent()
+
+    if total_spent + total_price > budget:
+        print(f"Cannot add {fruit}! Budget exceeded. Remaining budget: {budget-total_spent}")
+        return
+
+    with open(filename, mode="a", newline="") as file:
+        writer = csv.writer(file)
+        writer.writerow([fruit, unit_price, quantity, total_price])
+        print(f"{fruit} added successfully!")
+
+# Show Inventory
+def show_inventory():
+    print("\nFruits Inventory Summary:")
+    total_spent = 0
+
+    with open(filename, mode="r") as file:
+        reader = csv.DictReader(file)
+        for row in reader:
+            print(f"{row['Fruit']} | unit: {row['Unit Price']} | Qty: {row['Quantity']} | Total: {row['Total Price']}")
+            total_spent += float(row['Total Price'])
+
+    print(f"\nTotal Spent: {total_spent}")
+    print(f"Budget: {budget}")
+    print(f"Remaining Budget: {budget - total_spent}")
+
+# Main menu
+while True:
+    print("\n1. Add Fruit Item")
+    print("2. Show Inventory Summary")
+    print("3. Exit")
+    choice = input("Enter choice: ")
+
+    if choice == '1':
+        add_item()
+    elif choice == '2':
+        show_inventory()
+    elif choice == '3':
+        print("Exiting Program...")
+        break
+    else:
+        print("Invalid choice! Try again.")
+
