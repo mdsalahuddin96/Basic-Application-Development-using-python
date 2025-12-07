@@ -1,91 +1,45 @@
-import pandas as pd
+!pip install reportlab
 import csv
-import datetime
-from reportlab.lib.pagesizes import letter
-from reportlab.pdfgen import canvas
+from reportlab.lib import colors
+from reportlab.lib.pagesizes import A4
+from reportlab.platypus import SimpleDocTemplate, Table, TableStyle
 
+#2.2 Store Student basic information into csv file
+def save_students_to_csv(filename="students.csv"):
+  header=["Student_Id","Name","Roll","Semester","Shift","Department","Date of Birth","Phone No."]
+  students=[
+      ["101","Ishan","1201","5th","Morning","CSE","2002-01-15","01711111111"],
+      ["102","Rehian","1202","5th","Morning","EEE","2001-71-10","01722222222"],
+      ["103","Reshin","1203","5th","Evening","Civil","2000-03-25","01733333333"],
+      ["104","Prethi","1204","5th","Morning","Mechanical","2002-11-05","01744444444"],
+  ]
+  with open(filename, mode='w', newline='') as file:
+    writer=csv.writer(file)
+    writer.writerow(header)
+    writer.writerows(students)
+  print(f"CSV file '{filename}' created successfully.")
 
-# Take item data from the user
-def get_student_data():
-    ID = input("Enter Student ID: ")
-    Name =input("Enter Student Nane: ")
-    Roll=input("Enter Roll: ")
-    Semester=input("Enter Semester: ")
-    Shift=input("Enter Shift: ")
-    Department=input("Enter Department Nane: ")
-    Date_Of_Birth=input("Enter your DOB (Day-Month-year): ")
-    Phone_number=input("Enter Your Phone number: ")
-    return {
-        "ID": ID,
-        "Name": Name,
-        "Roll": Roll,
-        "Semester": Semester,
-        "Shift": Shift,
-        "Department": Department,
-        "Date_Of_Birth": Date_Of_Birth,
-        "Phone_number": Phone_number
-    }
-
-#Store items data into CSV file
-
-def store_data_to_csv(data, filename="students_info.csv"):
-    fieldnames = ["ID", "Name","Roll","Semester","Shift","Department","Date_Of_Birth","Phone_number"]
-
-    with open(filename, 'a', newline='') as csvfile:
-        writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
-        # Write the data
-        writer.writerow(data)
-
-#For generating PDF report
-
-def generate_pdf_report(filename="students_info.csv", pdf_filename="students_report.pdf"):
-    # Create a new PDF file
-    c = canvas.Canvas(pdf_filename, pagesize=letter)
-    width, height = letter
-    # Define text position
-    text_y_position = height - 1 * inch
-    # Read CSV file
-    data_frame = pd.read_csv('students_info.csv')
-    # Create a PDF object
-    c = canvas.Canvas("students_report.pdf")
-    # Insert your PDF generation logic here
-    # For example, simple text output for each row
-    for index, row in data_frame.iterrows():
-      c.drawString(72, 800 - 15 * index, str(row.values))
-    # Save the PDF
-    c.save()
-    print(f"PDF report generated: {pdf_filename}")
-
-
-# Main program
-def main():
-    while True:
-        print("\nStudent Info Management")
-        print("1. Add new student info")
-        print("2. Generate PDF")
-        print("3. Exit")
-
-        choice = input("Choose an option: ")
-        if choice == '1':
-
-            #Take item data from the user
-            data = get_student_data()
-
-            #Store student info into CSV file
-            store_data_to_csv(data)
-            print("student data added successfully!")
-
-        elif choice == '2':
-            #Print PDF report
-            generate_pdf_report()
-
-        elif choice == '3':
-            print("Exiting the program.")
-            break
-
-        else:
-            print("Invalid choice, please try again.")
-
-# Run the main program
+#2.3 Generate PDF report from csv file
+def generate_pdf_from_csv(csv_file='students.csv', pdf_file="students_report.pdf"):
+  with open(csv_file, mode='r') as file:
+    reader=csv.reader(file)
+    data=list(reader)
+  pdf=SimpleDocTemplate(pdf_file, pagesize=A4)
+  table=Table(data)
+  style=TableStyle([
+      ('BACKGROUND',(0,0),(-1,0),colors.lightblue),
+      ('TEXTCOLOR',(0,0),(-1,0),colors.whitesmoke),
+      ('ALIGN',(0,0),(-1,-1),'CENTER'),
+      ('FONTNAME',(0,0),(-1,0),'Helvetica-Bold'),
+      ('FONTSIZE',(0,0),(-1,0),12),
+      ('BOTTOMPADDING',(0,0),(-1,0),10),
+      (('BACKGROUND',(0,1),(-1,-1),colors.beige)),
+      (('GRID',(0,0),(-1,-1),1,colors.black)),
+  ])
+  table.setStyle(style)
+  elements=[table]
+  pdf.build(elements)
+  print(f"PDF report '{pdf_file}' generated successfully.")
 if __name__ == "__main__":
-    main()
+  save_students_to_csv()
+  generate_pdf_from_csv()
